@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 from main.models import User
 
-@app.route('/user/signup', methods=['GET'])
+@app.route('/user/signup', methods=['POST'])
 def signup():
     return User().signup() 
 
