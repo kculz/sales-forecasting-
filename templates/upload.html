@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="flex flex-center main">
-    <form action="POST" class="form-card">
+    <form action="POST" action="{{ url_for('upload')}}" class="form-card">
         <h1 class="text-center mb-5">Upload Prev Sales</h1>
         <div class="flex flex-center flex-col">
             <input type="file" name="file" id="file" required class="mb-5">

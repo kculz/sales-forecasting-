@@ -3,7 +3,7 @@
 {% block content %}
 <div class="flex flex-center main ">
     
-    <form method="POST" name="create_user" class="flex flex-col flex-center form-card px-5">
+    <form method="POST" action="{{ url_for('createUser')}}" name="create_user" class="flex flex-col flex-center form-card px-5">
 <h1 class="text-center">Create New User</h1>
 
         <div class="flex flex-col gap-5">
