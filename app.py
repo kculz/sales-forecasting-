@@ -1,42 +1,90 @@
-from flask import Flask, render_template, url_for, request, session,redirect
-from flask_pymongo import PyMongo
-import bcrypt
+from flask import Flask, render_template, url_for, request, redirect,session
+import sqlite3
+from forecast import monthly_sales, predict_data_frame
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+import base64
+import io
+import seaborn as sns
 
 app = Flask(__name__)
 
-app.config['MONGO_DBNAME']= 'sales-forecast'
-app.config['MONGO_URI'] ='mongodb+srv://peony:peony@cluster0.bpitxm8.mongodb.net/sales-forecast'
-
-mongo = PyMongo(app)
-from main.models import User
-
-@app.route('/user/signup', methods=['POST'])
-def signup():
+@app.route('/', methods=['GET', 'POST'])
+def index():
     if request.method == 'POST':
-        users = mongo.db.users
-        existing_user = users.find_one({'username': request.form['username']})
+        connection = sqlite3.connect('sales.db')
+        cursor = connection.cursor()
 
-        if existing_user is None:
-            hashpass = bcrypt.hashpw(request.form['password'].encode('utf-8'), bcrypt.gensalt())
-            users.insert({'username': request.form['username'], 'password': hashpass})
-            return redirect(url_for('signup'))
-    return 'User Already Exists'
+        username = request.form['username']
+        password = request.form['password']
+        query = "SELECT username, password FROM users WHERE username= '"+username+"' AND password='"+password+"' "
+        cursor.execute(query)
+        result = cursor.fetchall()
+        if len(result) == 0:
+            return "Invalid username || password"
+        else:
+            return render_template('dashboard.html')
+    return render_template('index.html')
 
-@app.route('/')
-def home():
-    if 'username' in session:
-        return session['username'] + ' Logged in'
-    return render_template('dashboard.html')
 
-@app.route('/login')
-def login():
-    users = mongo.db.users
-    login_user = users.find_one({'username': 'admin'})
-    if login_user:
-        if bcrypt.hashpw(request.form['username'].encode('utf-8'), login_user['password'].encode('utf-8')) == login_user['password'].encode('utf-8'):
-            session['username'] = request.form['username']
-            return redirect(url_for('dashboard'))
-    return 'Invalid Username || Password'
+@app.route('/forecast')
+def forecast():
+    fig = plt.figure(figsize=(15,5))
+    #Actual sale
+    plt.plot(monthly_sales['date'], monthly_sales['sales'])
+    #Predicted sales
+    plt.plot(predict_data_frame['date'], predict_data_frame['Linear Prediction'])
+    plt.title("sales forecast using Linear Regression")
+    plt.xlabel("Date")
+    plt.ylabel("Sales")
+    plt.legend(['Actual Sales', 'Predicted Sales'])
+    canvas = FigureCanvas(fig) 
+    img = io.BytesIO()
+    fig.savefig(img, format='png')
+    img.seek(0)
+    plot_url =base64.b64encode(img.getbuffer()).decode('utf-8')
+    # print(type(plot_url))
+    return render_template('forecast.html', plot_url=plot_url)
+
+@app.route('/upload')
+def upload():
+    print("hello")
+    return render_template('upload.html')
+
+@app.route('/createUser', methods=['GET','POST'])
+def createUser():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        connection = sqlite3.connect('sales.db')
+        cursor = connection.cursor()
+        query = "INSERT INTO users (username, password) VALUES('"+ username +"', '"+ password +"')"
+
+        if cursor.execute(query):
+            msg = "User added!"
+        else:
+            connection.rollback()
+            msg = "Insertion error!"
+
+        connection.close()
+        return render_template('users.html', msg=msg)
+
+@app.route('/user')
+def user():
+
+    connection = sqlite3.connect('sales.db')
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+
+    query = "SELECT * FROM users"
+    cursor.execute(query)
+    users = cursor.fetchall()
+    
+    return render_template('users.html', users=users)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

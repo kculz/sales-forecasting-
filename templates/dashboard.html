@@ -1,15 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="main">
+    <div class="main flex">
         <div class="aside-nav">
             <ul class="aside-nav-items">
                 <li class="nav-item"><a href="" class="nav-link">Dashoard</a></li>
-                <li class="nav-item"><a href="" class="nav-link">User</a></li>
+                <li class="nav-item"><a href="{{url_for('user')}}" class="nav-link">User</a></li>
             </ul>
         </div>
-        <div class="content flex flex-center">
+        <div class="content gap-5 px-5">
+                <a href="{{url_for('upload')}}" class="card card-create- forecast">
+                    <img src="{{url_for('static', filename='Jan-Business_team_3.jpg')}}"" alt="" srcset="" width="300px">
+                    <h1 class="text-center">Create Forecast</h1>
+                </a>
+                <a href="{{url_for('forecast')}}" class="card card-view-forecast">
+                    <img src="{{url_for('static', filename='Jan-Business_report_1.jpg')}}"" alt="" srcset="" width="300px">
+                    <h1 class="text-center">Display Forecast</h1>
+                </a>
 
+              
         </div>
     </div>
 {% endblock %}

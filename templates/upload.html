@@ -1,17 +1,14 @@
 {% extends "base.html" %}
-
 {% block content %}
 <div class="flex flex-center main">
-    <form action="POST"  class="form-card">
+    <form class="form-card">
         <h1 class="text-center mb-5">Upload Prev Sales</h1>
         <div class="flex flex-center flex-col">
             <input type="file" name="file" id="file" required class="mb-5">
         </div>
         <div class="flex flex-center text-center mt-5 mb-5">
-            <a href="#" class="btn btn-block-light">View Forecast</a>
+            <a href="{{url_for('forecast')}}" class="btn btn-block-light">View Forecast</a>
         </div>
     </form>
 </div>
-   
-
 {% endblock %}
