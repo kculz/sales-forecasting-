@@ -3,12 +3,23 @@
     margin: 0;
     box-sizing: border-box;
 }
+table{
+    border: #686464 1px solid;
+    width: 1000px;
+    text-align: center;
+}
+table td{
+    border: #686464 1px solid;
+    padding: 15px 10px;
+    margin: 0;
+}
 .flex{
     display: flex;
 }
 .flex-center{
     justify-content: center;
     align-items: center;
+    p0
 }
 .flex-col{
     flex-direction: column;

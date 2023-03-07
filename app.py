@@ -57,20 +57,18 @@ def createUser():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
         connection = sqlite3.connect('sales.db')
         cursor = connection.cursor()
         query = "INSERT INTO users (username, password) VALUES('"+ username +"', '"+ password +"')"
-
         if cursor.execute(query):
+            connection.commit()
             msg = "User added!"
+            return render_template('users.html', msg=msg)
         else:
             connection.rollback()
             msg = "Insertion error!"
-
-        connection.close()
-        return render_template('users.html', msg=msg)
-
+            connection.close()
+    return render_template('createUser.html')
 @app.route('/user')
 def user():
 
@@ -84,7 +82,9 @@ def user():
     
     return render_template('users.html', users=users)
 
-
+@app.route('/home')
+def home():
+    return render_template('dashboard.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
